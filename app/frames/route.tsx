@@ -1,40 +1,36 @@
 /* eslint-disable react/jsx-key */
+import React from "react";
 import { Button } from "frames.js/next";
-import { frames } from "./frames";
-import { appURL } from "../utils";
+import { frames } from "@/app/frames/frames";
+import { appURL } from "@/lib/utils";
 
-const frameHandler = frames(async (ctx) => {
-  const counter = ctx.message
-    ? ctx.searchParams.op === "+"
-      ? ctx.state.counter + 1
-      : ctx.state.counter - 1
-    : ctx.state.counter;
-
+const handler = frames(async (ctx) => {
   return {
     image: (
-      <div tw="flex flex-col">
-        <div tw="flex">frames.js starter</div>
-        {ctx.message?.inputText && (
-          <div tw="flex">{`Input: ${ctx.message.inputText}`}</div>
-        )}
-        <div tw="flex">Counter {counter}</div>
+      <div tw="relative flex flex-col text-center items-center justify-center">
+        <img
+          src={`${appURL()}/images/frame-application-brussels.png`}
+          tw="w-full"
+        />
       </div>
     ),
-    textInput: "Say something",
     buttons: [
-      <Button action="post" target={{ pathname: "/", query: { op: "+" } }}>
-        Increment
+      <Button action="post" key="1" target="/apply">
+        Apply
       </Button>,
-      <Button action="post" target={{ pathname: "/", query: { op: "-" } }}>
-        Decrement
-      </Button>,
-      <Button action="link" target={appURL()}>
-        External
+      <Button
+        action="link"
+        key="2"
+        target="https://passport.talentprotocol.com/signin"
+      >
+        Sign up to passport
       </Button>,
     ],
-    state: { counter: counter },
+    imageOptions: {
+      aspectRatio: "1:1",
+    },
   };
 });
 
-export const GET = frameHandler;
-export const POST = frameHandler;
+export const GET = handler;
+export const POST = handler;
