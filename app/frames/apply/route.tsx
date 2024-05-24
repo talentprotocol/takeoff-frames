@@ -16,6 +16,7 @@ const handler = frames(async (ctx) => {
         ? ctx.message?.requesterVerifiedAddresses[0]
         : ctx.message?.requesterCustodyAddress ||
           ctx.message?.verifiedWalletAddress; // XMTP wallet address
+    const userName = ctx.message?.requesterUserData?.displayName || "";
 
     if (!userAddress) {
       throw new Error("User not found");
@@ -41,7 +42,7 @@ const handler = frames(async (ctx) => {
         image: (
           <div tw="relative flex flex-col text-center items-center justify-center">
             <img
-              src={`${appURL()}/images/frame-application-brussels.png`}
+              src={`${appURL()}/images/frame-passport-not-found.png`}
               tw="w-full"
             />
           </div>
@@ -52,7 +53,14 @@ const handler = frames(async (ctx) => {
             key="1"
             target="https://passport.talentprotocol.com/signin"
           >
-            Sign up to passport
+            Create Passport
+          </Button>,
+          <Button
+            action="link"
+            key="2"
+            target="https://play.talentprotocol.com/votings/eth-cc"
+          >
+            Learn More
           </Button>,
         ],
         imageOptions: {
@@ -64,10 +72,13 @@ const handler = frames(async (ctx) => {
     return {
       image: (
         <div tw="relative flex flex-col text-center items-center justify-center">
-          <img
-            src={`${appURL()}/images/frame-application-brussels.png`}
-            tw="w-full"
-          />
+          <img src={`${appURL()}/images/frame-passport.png`} tw="w-full" />
+          <div tw="absolute top-[150px] left-0 w-full h-full flex flex-col gap-0 px-[20px] text-[#F7F7F7] text-[98px]">
+            <p tw="mx-auto">{`Hey ${userName.slice(0, 12)},`}</p>
+            <p tw="mx-auto" style={{ marginTop: "-90px" }}>
+              ready for Brussels?
+            </p>
+          </div>
         </div>
       ),
       buttons: [
@@ -76,7 +87,10 @@ const handler = frames(async (ctx) => {
           key="1"
           target="https://play.talentprotocol.com/votings/eth-cc"
         >
-          Apply here
+          Confirm apply
+        </Button>,
+        <Button action="post" key="2" target="/">
+          Back
         </Button>,
       ],
       imageOptions: {
@@ -88,21 +102,25 @@ const handler = frames(async (ctx) => {
       image: (
         <div tw="relative flex flex-col text-center items-center justify-center">
           <img
-            src={`${appURL()}/images/frame-application-brussels.png`}
+            src={`${appURL()}/images/frame-passport-not-found.png`}
             tw="w-full"
           />
         </div>
       ),
       buttons: [
-        <Button action="link" key="1" target="https://play.talentprotocol.com/">
-          Apply
+        <Button
+          action="link"
+          key="1"
+          target="https://passport.talentprotocol.com/signin"
+        >
+          Create Passport
         </Button>,
         <Button
           action="link"
           key="2"
-          target="https://passport.talentprotocol.com/signin"
+          target="https://play.talentprotocol.com/votings/eth-cc"
         >
-          Sign up to passport
+          Learn More
         </Button>,
       ],
       imageOptions: {

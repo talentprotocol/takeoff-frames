@@ -8,10 +8,7 @@ const handler = frames(async (ctx) => {
   return {
     image: (
       <div tw="relative flex flex-col text-center items-center justify-center">
-        <img
-          src={`${appURL()}/images/frame-application-brussels.png`}
-          tw="w-full"
-        />
+        <img src={`${appURL()}/images/frame-landing-general.png`} tw="w-full" />
       </div>
     ),
     buttons: [
@@ -21,9 +18,9 @@ const handler = frames(async (ctx) => {
       <Button
         action="link"
         key="2"
-        target="https://passport.talentprotocol.com/signin"
+        target="https://play.talentprotocol.com/votings/eth-cc"
       >
-        Sign up to passport
+        Learn more
       </Button>,
     ],
     imageOptions: {
