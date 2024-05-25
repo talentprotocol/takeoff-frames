@@ -16,7 +16,7 @@ const handler = frames(async (ctx) => {
         ? ctx.message?.requesterVerifiedAddresses[0]
         : ctx.message?.requesterCustodyAddress ||
           ctx.message?.verifiedWalletAddress; // XMTP wallet address
-    const userName = ctx.message?.requesterUserData?.displayName || "";
+    const userName = ctx.message?.requesterUserData?.username || "";
 
     if (!userAddress) {
       throw new Error("User not found");
@@ -74,7 +74,7 @@ const handler = frames(async (ctx) => {
         <div tw="relative flex flex-col text-center items-center justify-center">
           <img src={`${appURL()}/images/frame-passport.png`} tw="w-full" />
           <div tw="absolute top-[150px] left-0 w-full h-full flex flex-col gap-0 px-[20px] text-[#F7F7F7] text-[98px]">
-            <p tw="mx-auto">{`Hey ${userName.slice(0, 12)},`}</p>
+            <p tw="mx-auto">{`Hey ${userName},`}</p>
             <p tw="mx-auto" style={{ marginTop: "-90px" }}>
               ready for Brussels?
             </p>
