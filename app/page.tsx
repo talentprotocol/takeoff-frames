@@ -16,5 +16,17 @@ export async function generateMetadata(): Promise<Metadata> {
 // This is a react server component only
 export default async function Home() {
   // then, when done, return next frame
-  return <div className="p-4">Apply to TakeOff Brussels</div>;
+  return (
+    <div className="p-4">
+      Apply to TakeOff Brussels{" "}
+      <a
+        href="https://play.talentprotocol.com/votings/eth-cc"
+        target="_blank"
+        className="underline cursor-pointer"
+      >
+        here
+      </a>
+      !
+    </div>
+  );
 }
