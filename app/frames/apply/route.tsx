@@ -118,7 +118,7 @@ const handler = frames(async (ctx) => {
         <Button
           action="link"
           key="2"
-          target="https://play.talentprotocol.com/votings/eth-cc"
+          target="https://www.notion.so/talentprotocol/Scholarships-EthCC-Take-Off-How-To-Apply-Guide-ec06928c69aa49699649256690d4b781?pvs=4"
         >
           Learn More
         </Button>,
