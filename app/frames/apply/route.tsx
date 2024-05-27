@@ -42,7 +42,7 @@ const handler = frames(async (ctx) => {
         image: (
           <div tw="relative flex flex-col text-center items-center justify-center">
             <img
-              src={`${appURL()}/images/frame-passport-not-found.png`}
+              src={`${appURL()}/images/frame-passport-not-found.jpg`}
               tw="w-full"
             />
           </div>
@@ -72,7 +72,7 @@ const handler = frames(async (ctx) => {
     return {
       image: (
         <div tw="relative flex flex-col text-center items-center justify-center">
-          <img src={`${appURL()}/images/frame-passport.png`} tw="w-full" />
+          <img src={`${appURL()}/images/frame-passport.jpg`} tw="w-full" />
           <div tw="absolute top-[150px] left-0 w-full h-full flex flex-col gap-0 px-[20px] text-[#F7F7F7] text-[98px]">
             <p tw="mx-auto">{`Hey ${userName},`}</p>
             <p tw="mx-auto" style={{ marginTop: "-90px" }}>
@@ -102,7 +102,7 @@ const handler = frames(async (ctx) => {
       image: (
         <div tw="relative flex flex-col text-center items-center justify-center">
           <img
-            src={`${appURL()}/images/frame-passport-not-found.png`}
+            src={`${appURL()}/images/frame-passport-not-found.jpg`}
             tw="w-full"
           />
         </div>
