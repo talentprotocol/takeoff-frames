@@ -53,13 +53,13 @@ const handler = frames(async (ctx) => {
 
       return {
         image: (
-          <div tw="relative flex flex-col text-center items-center justify-center">
+          <div tw="relative flex">
             <img
               src={`${appURL()}/images/voting/frame-leaderboard-new.jpg`}
               tw="w-full"
             />
-            <div tw="absolute top-[350px] left-0 w-[1025px] h-[575px] flex flex-row px-[55px] text-[#F7F7F7]">
-              <div tw="flex flex-row my-auto">
+            <div tw="absolute top-[350px] left-0 w-[1025px] h-[575px] flex px-[55px] text-[#F7F7F7]">
+              <div tw="flex my-auto">
                 <div tw="flex flex-col mx-[5px] border-r-2 border-[#7459EC]">
                   {leaderboard
                     .slice(0, halfIndex)
@@ -135,12 +135,12 @@ const handler = frames(async (ctx) => {
 
       return {
         image: (
-          <div tw="relative flex flex-col text-center items-center justify-center">
+          <div tw="relative flex">
             <img
               src={`${appURL()}/images/voting/frame-leaderboard-new.jpg`}
               tw="w-full"
             />
-            <div tw="absolute top-[365px] left-[55px] w-[975px] h-[555px] flex flex-row text-[#F7F7F7]">
+            <div tw="absolute top-[365px] left-[55px] w-[975px] h-[555px] flex text-[#F7F7F7]">
               <div tw="flex flex-col mx-auto items-center justify-around my-[25px]">
                 <img
                   src={imgUrl}
@@ -219,7 +219,7 @@ const handler = frames(async (ctx) => {
       image: (
         <div tw="relative flex flex-col text-center items-center justify-center">
           <img src={`${appURL()}/images/voting/frame-error.jpg`} tw="w-full" />
-          <div tw="absolute bottom-[40px] left-[55px] w-[975px] h-[480px] flex flex-row text-[#F7F7F7]">
+          <div tw="absolute bottom-[40px] left-[55px] w-[975px] h-[480px] flex text-[#F7F7F7]">
             <div tw="flex flex-col mx-auto items-center justify-around my-[25px]">
               <p tw="text-[80px]" style={{ fontFamily: "Inter-Bold" }}>
                 {errorMessage}
@@ -258,11 +258,11 @@ const UserComponent = ({
   const newIndex = pageIndex > 1 ? tmpIndex + 6 * (pageIndex - 1) : tmpIndex;
 
   return (
-    <div tw="flex flex-row justify-around h-[70px] w-[480px] my-[10px] mx-auto px-[20px]">
+    <div tw="flex justify-around h-[70px] w-[480px] my-[10px] mx-auto px-[20px]">
       <p tw="text-[21px] my-auto w-[50px]" style={{ fontFamily: "Inter-Bold" }}>
         {`#${newIndex + 1}`}
       </p>
-      <div tw="flex flex-row items-center w-[250px]">
+      <div tw="flex items-center w-[250px]">
         <img
           src={user.profile_picture_url}
           tw="h-[60px] w-[60px] rounded-full mr-[10px]"

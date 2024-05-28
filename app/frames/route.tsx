@@ -15,7 +15,7 @@ const handler = frames(async (ctx) => {
           src={`${appURL()}/images/voting/frame-voting-landing.jpg`}
           tw="w-full"
         />
-        <div tw="absolute top-[250px] left-[75px] w-[975px] flex flex-row text-[#DFDFE1]">
+        <div tw="absolute top-[250px] left-[75px] w-[975px] flex text-[#DFDFE1]">
           <p tw="text-[80px]" style={{ fontFamily: "Inter-Bold" }}>
             {`${voting?.prize_pool || "XXX"} $TAL`}
           </p>
