@@ -178,6 +178,7 @@ const handler = frames(async (ctx) => {
     }
   } catch (error) {
     const errorMessage = (error as Error).message || "An error occurred";
+    console.error("vote error", errorMessage);
     if (errorMessage === "Passport not found") {
       return {
         image: (
