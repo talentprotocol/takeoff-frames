@@ -280,7 +280,7 @@ const UserComponent = ({
         </div>
       </div>
 
-      <p tw="flex text-[19px] px-[9px] rounded-[6px] text-white border-2 border-[#32383E] my-auto">
+      <p tw="flex text-[19px] ml-[10px] px-[9px] rounded-[6px] text-white border-2 border-[#32383E] my-auto">
         {`${user.current_user_votes_count} votes`}
       </p>
     </div>
