@@ -3,12 +3,24 @@ import React from "react";
 import { Button } from "frames.js/next";
 import { frames } from "@/app/frames/frames";
 import { appURL } from "@/lib/utils";
+import { getTalentProtocolVoting } from "@/lib/talent-protocol";
 
 const handler = frames(async (ctx) => {
+  const voting = await getTalentProtocolVoting("eth-cc");
+
   return {
     image: (
       <div tw="relative flex flex-col text-center items-center justify-center">
-        <img src={`${appURL()}/images/frame-landing-general.jpg`} tw="w-full" />
+        <img
+          src={`${appURL()}/images/voting/frame-voting-landing.jpg`}
+          tw="w-full"
+        />
+        <div tw="absolute top-[250px] left-[75px] w-[975px] flex flex-row text-[#DFDFE1]">
+          <p tw="text-[80px]" style={{ fontFamily: "Inter-Bold" }}>
+            {`${voting?.prize_pool || "XXX"} $TAL`}
+          </p>
+          <div tw="flex flex-col mx-auto items-center justify-around my-[25px]"></div>
+        </div>
       </div>
     ),
     buttons: [
