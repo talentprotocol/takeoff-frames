@@ -2,38 +2,13 @@
 import React from "react";
 import { Button } from "frames.js/next";
 import { frames } from "@/app/frames/frames";
-import { appURL } from "@/lib/utils";
-
-const UserComponent = ({ user, index, halfIndex, isSecondHalf }: any) => {
-  const newIndex = isSecondHalf ? halfIndex + index : index;
-  return (
-    <div tw="flex flex-row justify-around h-[70px] w-[480px] my-[10px] mx-auto px-[20px]">
-      <p tw="text-[26px] my-auto w-[60px]" style={{ fontFamily: "Inter-Bold" }}>
-        {`#${newIndex + 1}`}
-      </p>
-
-      <div tw="flex flex-row items-center w-[250px]">
-        <img
-          src={user.profile_picture_url}
-          tw="h-[56px] w-[56px] rounded-full my-auto object-cover mr-[20px]"
-        />
-        <div tw="flex flex-col">
-          <p
-            tw="text-[19px] text-[#F0F4F8] my-auto"
-            style={{ fontFamily: "Inter-Bold" }}
-          >
-            {user.name}
-          </p>
-          <p tw="text-[17px] text-[#9FA6AD] my-auto">{`@${user.username}`}</p>
-        </div>
-      </div>
-
-      <p tw="flex text-[19px] px-[9px] rounded-[6px] text-white border-2 border-[#32383E] my-auto">
-        {`${user.current_user_votes_count} votes`}
-      </p>
-    </div>
-  );
-};
+import { appURL, getRotateDeg } from "@/lib/utils";
+import {
+  getTalentProtocolUser,
+  getTalentProtocolVoting,
+  getTalentProtocolVotingLeaderboard,
+  searchTalentProtocolUser,
+} from "@/lib/talent-protocol";
 
 const handler = frames(async (ctx) => {
   try {
@@ -47,28 +22,163 @@ const handler = frames(async (ctx) => {
         ? ctx.message?.requesterVerifiedAddresses[0]
         : ctx.message?.requesterCustodyAddress ||
           ctx.message?.verifiedWalletAddress; // XMTP wallet address
-    const userName = ctx.message?.requesterUserData?.username || "";
-    if (!userAddress) {
-      throw new Error("User not found");
+    if (!userAddress) throw new Error("User not found");
+
+    // check if userAddress has a Talent Protocol Passport associated
+    await getTalentProtocolUser(userAddress);
+
+    const nominatedUsername = ctx.message?.inputText
+      ?.replaceAll("@", "")
+      .trim();
+
+    if (!nominatedUsername) {
+      const index = parseInt(ctx.url.searchParams.get("index") || "1");
+
+      const [voting, leaderboard] = await Promise.all([
+        getTalentProtocolVoting("eth-cc"),
+        getTalentProtocolVotingLeaderboard("eth-cc", index),
+      ]);
+      if (!voting || !leaderboard) throw new Error("Voting not found");
+
+      const leaderboardRotateMap = new Map<string, number>();
+      for (let i = 0; i < leaderboard.length; i++) {
+        const rotateDeg = await getRotateDeg(
+          leaderboard[i].profile_picture_url
+        );
+        leaderboardRotateMap.set(leaderboard[i].profile_picture_url, rotateDeg);
+      }
+
+      const hasNextButton = voting.candidates_count > 10;
+      const halfIndex = Math.floor(leaderboard.length / 2);
+
+      return {
+        image: (
+          <div tw="relative flex flex-col text-center items-center justify-center">
+            <img
+              src={`${appURL()}/images/voting/frame-leaderboard.jpg`}
+              tw="w-full"
+            />
+            <div tw="absolute top-[450px] left-0 w-[1025px] h-[480px] flex flex-row px-[55px] text-[#F7F7F7]">
+              <div tw="flex flex-row my-auto">
+                <div tw="flex flex-col mx-[5px] border-r-2 border-[#7459EC]">
+                  {leaderboard
+                    .slice(0, halfIndex)
+                    .map((user: any, index: number) => (
+                      <UserComponent
+                        user={user}
+                        index={index}
+                        halfIndex={halfIndex}
+                        key={user.username}
+                        isSecondHalf={false}
+                        rotateDeg={
+                          leaderboardRotateMap.get(user.profile_picture_url) ||
+                          0
+                        }
+                      />
+                    ))}
+                </div>
+                <div tw="flex flex-col">
+                  {leaderboard
+                    .slice(halfIndex)
+                    .map((user: any, index: number) => (
+                      <UserComponent
+                        user={user}
+                        index={index}
+                        halfIndex={halfIndex}
+                        key={user.username}
+                        isSecondHalf={true}
+                        rotateDeg={
+                          leaderboardRotateMap.get(user.profile_picture_url) ||
+                          0
+                        }
+                      />
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ),
+        textInput: "Candidate username to vote for:",
+        buttons: [
+          <Button action="post" key="1" target={`/vote?index=${index}`}>
+            Vote
+          </Button>,
+          hasNextButton && (
+            <Button action="post" key="2" target={`/vote?index=${index + 1}`}>
+              Next
+            </Button>
+          ),
+          <Button
+            action="post"
+            key={hasNextButton ? "3" : "2"}
+            target={index > 1 ? `${index - 1}` : "/"}
+          >
+            Back
+          </Button>,
+        ],
+        imageOptions: {
+          aspectRatio: "1:1",
+        },
+      };
+    } else {
+      const nominatedUser = await searchTalentProtocolUser(nominatedUsername);
+      if (!nominatedUser) throw new Error("Nominated user not found");
+
+      const imgUrl = nominatedUser.passport_profile.image_url;
+      const rotateDeg = await getRotateDeg(imgUrl);
+
+      return {
+        image: (
+          <div tw="relative flex flex-col text-center items-center justify-center">
+            <img
+              src={`${appURL()}/images/voting/frame-leaderboard.jpg`}
+              tw="w-full"
+            />
+            <div tw="absolute top-[440px] left-[55px] w-[975px] h-[480px] flex flex-row text-[#F7F7F7]">
+              <div tw="flex flex-col mx-auto items-center justify-around my-[25px]">
+                <img
+                  src={imgUrl}
+                  tw="h-[250px] w-[250px] rounded-full"
+                  style={{
+                    transform: `rotate(${rotateDeg}deg)`,
+                    objectFit: "cover",
+                  }}
+                />
+                <div tw="flex flex-col mx-auto text-center items-center">
+                  <p
+                    tw="text-[58px] text-[#F0F4F8] my-auto"
+                    style={{ fontFamily: "Inter-Bold" }}
+                  >
+                    {nominatedUser.passport_profile.display_name}
+                  </p>
+                  <p tw="text-[42px] text-[#9FA6AD] my-auto">
+                    {`@${nominatedUser.passport_profile.name}`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ),
+        buttons: [
+          <Button
+            action="link"
+            key="1"
+            target={`${process.env.TALENT_API_URL}/votings/eth-cc?open_voting_modal=true&name=${nominatedUser.passport_profile.name}`}
+          >
+            Vote
+          </Button>,
+          <Button action="post" key="3" target={`/vote`}>
+            Back
+          </Button>,
+        ],
+        imageOptions: {
+          aspectRatio: "1:1",
+        },
+      };
     }
-
-    const index = parseInt(ctx.url.searchParams.get("index") || "1");
-
-    const url = `${process.env.TALENT_API_URL}/api/v1/votings/eth-cc/candidates_leaderboard?page=${index}&per_page=10`;
-    const headers = {
-      "Content-Type": "application/json",
-      "X-API-KEY": process.env.TALENT_API_TOKEN || "",
-    };
-    const response = await fetch(url, { headers });
-    const data = (await response.json()) as any;
-    const halfIndex = Math.floor(data.leaderboard.results.length / 2);
-
-    if (
-      !response.ok ||
-      response.status !== 200 ||
-      data.error ||
-      !data.leaderboard
-    ) {
+  } catch (error) {
+    const errorMessage = (error as Error).message || "An error occurred";
+    if (errorMessage === "Passport not found") {
       return {
         image: (
           <div tw="relative flex flex-col text-center items-center justify-center">
@@ -89,7 +199,7 @@ const handler = frames(async (ctx) => {
           <Button
             action="link"
             key="2"
-            target="https://www.notion.so/talentprotocol/Scholarships-EthCC-Take-Off-How-To-Apply-Guide-ec06928c69aa49699649256690d4b781?pvs=4"
+            target="https://talentprotocol.notion.site/EthCC-Scholarship-How-To-Vote-Guide-47fe0b37b079405787bd4d412973ab15?pvs=4"
           >
             Learn More
           </Button>,
@@ -99,87 +209,25 @@ const handler = frames(async (ctx) => {
         },
       };
     }
-
     return {
       image: (
         <div tw="relative flex flex-col text-center items-center justify-center">
-          <img
-            src={`${appURL()}/images/voting/frame-leaderboard.jpg`}
-            tw="w-full"
-          />
-          <div tw="absolute top-[450px] left-0 w-[1025px] h-[480px] flex flex-row px-[55px] text-[#F7F7F7]">
-            <div tw="flex flex-row my-auto">
-              <div tw="flex flex-col mx-[5px] border-r-2 border-[#7459EC]">
-                {data.leaderboard.results
-                  .slice(0, halfIndex)
-                  .map((user: any, index: number) => (
-                    <UserComponent
-                      user={user}
-                      index={index}
-                      halfIndex={halfIndex}
-                      key={user.username}
-                      isSecondHalf={false}
-                    />
-                  ))}
-              </div>
-              <div tw="flex flex-col">
-                {data.leaderboard.results
-                  .slice(halfIndex)
-                  .map((user: any, index: number) => (
-                    <UserComponent
-                      user={user}
-                      index={index}
-                      halfIndex={halfIndex}
-                      key={user.username}
-                      isSecondHalf={true}
-                    />
-                  ))}
-              </div>
+          <img src={`${appURL()}/images/voting/frame-error.jpg`} tw="w-full" />
+          <div tw="absolute bottom-[40px] left-[55px] w-[975px] h-[480px] flex flex-row text-[#F7F7F7]">
+            <div tw="flex flex-col mx-auto items-center justify-around my-[25px]">
+              <p tw="text-[80px]" style={{ fontFamily: "Inter-Bold" }}>
+                {errorMessage}
+              </p>
             </div>
           </div>
         </div>
       ),
-      textInput: "Select a candidate to vote for: ",
       buttons: [
-        <Button action="post" key="1" target={`/vote/address`}>
-          Vote
+        <Button action="post" key="1" target="/vote">
+          Back to Vote
         </Button>,
-        <Button action="post" key="2" target={`/vote?index=${index + 1}`}>
-          Next
-        </Button>,
-        <Button action="post" key="3" target="/">
-          Back
-        </Button>,
-      ],
-      imageOptions: {
-        aspectRatio: "1:1",
-      },
-    };
-  } catch (error) {
-    console.error("error on vote route", error);
-    return {
-      image: (
-        <div tw="relative flex flex-col text-center items-center justify-center">
-          <img
-            src={`${appURL()}/images/voting/frame-leaderboard.jpg`}
-            tw="w-full"
-          />
-        </div>
-      ),
-      buttons: [
-        <Button
-          action="link"
-          key="1"
-          target="https://passport.talentprotocol.com/signin"
-        >
-          Create Passport
-        </Button>,
-        <Button
-          action="link"
-          key="2"
-          target="https://play.talentprotocol.com/votings/eth-cc"
-        >
-          Learn More
+        <Button action="post" key="2" target="/">
+          Home
         </Button>,
       ],
       imageOptions: {
@@ -191,3 +239,42 @@ const handler = frames(async (ctx) => {
 
 export const GET = handler;
 export const POST = handler;
+
+const UserComponent = ({
+  user,
+  index,
+  halfIndex,
+  isSecondHalf,
+  rotateDeg,
+}: any) => {
+  const newIndex = isSecondHalf ? halfIndex + index : index;
+
+  return (
+    <div tw="flex flex-row justify-around h-[70px] w-[480px] my-[10px] mx-auto px-[20px]">
+      <p tw="text-[26px] my-auto w-[60px]" style={{ fontFamily: "Inter-Bold" }}>
+        {`#${newIndex + 1}`}
+      </p>
+
+      <div tw="flex flex-row items-center w-[250px]">
+        <img
+          src={user.profile_picture_url}
+          tw="h-[60px] w-[60px] rounded-full mr-[20px]"
+          style={{ transform: `rotate(${rotateDeg}deg)`, objectFit: "cover" }}
+        />
+        <div tw="flex flex-col">
+          <p
+            tw="text-[19px] text-[#F0F4F8] my-auto"
+            style={{ fontFamily: "Inter-Bold" }}
+          >
+            {user.name}
+          </p>
+          <p tw="text-[19px] text-[#9FA6AD] my-auto">{`@${user.username}`}</p>
+        </div>
+      </div>
+
+      <p tw="flex text-[19px] px-[9px] rounded-[6px] text-white border-2 border-[#32383E] my-auto">
+        {`${user.current_user_votes_count} votes`}
+      </p>
+    </div>
+  );
+};

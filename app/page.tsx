@@ -4,8 +4,8 @@ import { FRAMES_BASE_PATH, appURL } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "frames.js starter",
-    description: "This is a frames.js starter template",
+    title: "TakeOff EthCC Brussels",
+    description: "TakeOff by Talent Protocol",
     other: {
       ...(await fetchMetadata(new URL(FRAMES_BASE_PATH, appURL()))),
     },

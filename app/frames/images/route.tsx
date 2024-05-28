@@ -18,6 +18,7 @@ const boldFontData = fs.readFileSync(
 const imagesWorker = createImagesWorker({
   secret: "MY_VERY_SECRET_SECRET",
   imageOptions: {
+    debug: false,
     sizes: {
       "1:1": {
         width: 1080,
