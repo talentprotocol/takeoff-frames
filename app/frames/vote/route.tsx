@@ -169,7 +169,7 @@ const handler = frames(async (ctx) => {
           <Button
             action="link"
             key="1"
-            target={`${process.env.TALENT_API_URL}/votings/eth-cc?open_voting_modal=true&name=${nominatedUser.passport_profile.name}`}
+            target={`https://play.talentprotocol.com/votings/eth-cc?open_voting_modal=true&name=${nominatedUser.passport_profile.name}`}
           >
             Vote
           </Button>,
