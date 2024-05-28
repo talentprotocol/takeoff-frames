@@ -103,24 +103,24 @@ const handler = frames(async (ctx) => {
         textInput: "Candidate username to vote for:",
         buttons: [
           <Button action="post" key="1" target={`/vote?index=${pageIndex}`}>
-            Vote
+            {`Vote ✅`}
+          </Button>,
+          <Button
+            action="post"
+            key="2"
+            target={pageIndex > 1 ? `/vote?index=${pageIndex - 1}` : "/"}
+          >
+            {`⬅️ Back`}
           </Button>,
           hasNextButton && (
             <Button
               action="post"
-              key="2"
+              key="3"
               target={`/vote?index=${pageIndex + 1}`}
             >
-              Next
+              {`Next ➡️`}
             </Button>
           ),
-          <Button
-            action="post"
-            key={hasNextButton ? "3" : "2"}
-            target={pageIndex > 1 ? `/vote?index=${pageIndex - 1}` : "/"}
-          >
-            Back
-          </Button>,
         ],
         imageOptions: {
           aspectRatio: "1:1",
@@ -171,10 +171,10 @@ const handler = frames(async (ctx) => {
             key="1"
             target={`https://play.talentprotocol.com/votings/eth-cc?open_voting_modal=true&name=${nominatedUser.passport_profile.name}`}
           >
-            Vote
+            {`Vote ✅`}
           </Button>,
           <Button action="post" key="3" target={`/vote`}>
-            Back
+            {`⬅️ Back`}
           </Button>,
         ],
         imageOptions: {
@@ -230,7 +230,7 @@ const handler = frames(async (ctx) => {
       ),
       buttons: [
         <Button action="post" key="1" target="/vote">
-          Back to Vote
+          {`⬅️ Back to Vote`}
         </Button>,
         <Button action="post" key="2" target="/">
           Home
@@ -271,12 +271,12 @@ const UserComponent = ({
         />
         <div tw="flex flex-col">
           <p
-            tw="text-[19px] text-[#F0F4F8] my-auto"
+            tw="text-[18px] text-[#F0F4F8] my-auto"
             style={{ fontFamily: "Inter-Bold" }}
           >
             {user.name.slice(0, 20)}
           </p>
-          <p tw="text-[19px] text-[#9FA6AD] my-auto">{`@${user.username}`}</p>
+          <p tw="text-[20px] text-[#E5E7E9] my-auto">{`@${user.username}`}</p>
         </div>
       </div>
 

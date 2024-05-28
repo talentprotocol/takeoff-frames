@@ -42,7 +42,7 @@ const handler = frames(async (ctx) => {
           Confirm apply
         </Button>,
         <Button action="post" key="2" target="/">
-          Back
+          {`⬅️ Back`}
         </Button>,
       ],
       imageOptions: {
