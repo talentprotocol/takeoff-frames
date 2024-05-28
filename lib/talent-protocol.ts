@@ -1,8 +1,9 @@
 import { unstable_cache } from "next/cache";
 
-export const CACHE_1_MINUTE = 60;
+export const CACHE_5_SECONDS = 5;
+export const CACHE_2_MINUTES = 60 * 2;
 export const CACHE_5_MINUTES = 60 * 5;
-export const CACHE_1_HOUR = 60 * 60;
+
 export type CacheKey =
   | `talent_protocol_${string}`
   | `talent_protocol_search_${string}`
@@ -87,7 +88,7 @@ export const getTalentProtocolVoting = async (votingSlug: string) => {
       return data.voting;
     },
     [`talent_protocol_voting_${votingSlug}`] as CacheKey[],
-    { revalidate: CACHE_1_HOUR }
+    { revalidate: CACHE_5_SECONDS }
   )(votingSlug);
 };
 
@@ -117,6 +118,6 @@ export const getTalentProtocolVotingLeaderboard = async (
       return data.leaderboard?.results;
     },
     [`talent_protocol_voting_${query}_page_${index}`] as CacheKey[],
-    { revalidate: CACHE_5_MINUTES }
+    { revalidate: CACHE_2_MINUTES }
   )(query, index);
 };
