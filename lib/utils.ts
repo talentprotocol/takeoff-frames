@@ -1,3 +1,4 @@
+import ExifReader from "exifreader";
 import { headers } from "next/headers";
 
 const DEFAULT_DEBUGGER_URL =
@@ -20,19 +21,11 @@ export function currentURL(pathname: string): URL {
   }
 }
 
-export function vercelURL() {
-  return process.env.NEXT_PUBLIC_APP_URL
-    ? process.env.NEXT_PUBLIC_APP_URL
-    : undefined;
-}
-
 export function appURL() {
   if (process.env.NEXT_PUBLIC_APP_URL) {
     return process.env.NEXT_PUBLIC_APP_URL;
   } else {
-    const url =
-      process.env.NEXT_PUBLIC_APP_URL || vercelURL() || "http://localhost:3000";
-    return url;
+    return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   }
 }
 
@@ -49,3 +42,23 @@ export function createDebugUrl(frameURL: string | URL): string {
 }
 
 export const FRAMES_BASE_PATH = "/frames";
+
+export const getRotateDeg = async (imgUrl: string): Promise<number> => {
+  const exifTags = await ExifReader.load(imgUrl);
+  const orientationTag = exifTags?.["Orientation"];
+  let rotateDeg = 0;
+  if (orientationTag) {
+    switch (orientationTag.value) {
+      case 3:
+        rotateDeg = 180;
+        break;
+      case 6:
+        rotateDeg = 90;
+        break;
+      case 8:
+        rotateDeg = 270;
+        break;
+    }
+  }
+  return rotateDeg;
+};
