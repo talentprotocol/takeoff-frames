@@ -99,7 +99,7 @@ export const getTalentProtocolVotingLeaderboard = async (
     async (query: string, index: number) => {
       const api_url = process.env.TALENT_API_URL;
       const api_token = process.env.TALENT_API_TOKEN;
-      const url = `${api_url}/api/v1/votings/${query}/candidates_leaderboard?page=${index}&per_page=10`;
+      const url = `${api_url}/api/v1/votings/${query}/candidates_leaderboard?page=${index}&per_page=6`;
       const headers = {
         "Content-Type": "application/json",
         "X-API-KEY": api_token || "",

@@ -32,11 +32,11 @@ const handler = frames(async (ctx) => {
       .trim();
 
     if (!nominatedUsername) {
-      const index = parseInt(ctx.url.searchParams.get("index") || "1");
+      const pageIndex = parseInt(ctx.url.searchParams.get("index") || "1");
 
       const [voting, leaderboard] = await Promise.all([
         getTalentProtocolVoting("eth-cc"),
-        getTalentProtocolVotingLeaderboard("eth-cc", index),
+        getTalentProtocolVotingLeaderboard("eth-cc", pageIndex),
       ]);
       if (!voting || !leaderboard) throw new Error("Voting not found");
 
@@ -48,7 +48,7 @@ const handler = frames(async (ctx) => {
         leaderboardRotateMap.set(leaderboard[i].profile_picture_url, rotateDeg);
       }
 
-      const hasNextButton = voting.candidates_count > 10;
+      const hasNextButton = voting.candidates_count - 6 * pageIndex > 0;
       const halfIndex = Math.floor(leaderboard.length / 2);
 
       return {
@@ -66,6 +66,7 @@ const handler = frames(async (ctx) => {
                     .map((user: any, index: number) => (
                       <UserComponent
                         user={user}
+                        pageIndex={pageIndex}
                         index={index}
                         halfIndex={halfIndex}
                         key={user.username}
@@ -83,6 +84,7 @@ const handler = frames(async (ctx) => {
                     .map((user: any, index: number) => (
                       <UserComponent
                         user={user}
+                        pageIndex={pageIndex}
                         index={index}
                         halfIndex={halfIndex}
                         key={user.username}
@@ -100,18 +102,22 @@ const handler = frames(async (ctx) => {
         ),
         textInput: "Candidate username to vote for:",
         buttons: [
-          <Button action="post" key="1" target={`/vote?index=${index}`}>
+          <Button action="post" key="1" target={`/vote?index=${pageIndex}`}>
             Vote
           </Button>,
           hasNextButton && (
-            <Button action="post" key="2" target={`/vote?index=${index + 1}`}>
+            <Button
+              action="post"
+              key="2"
+              target={`/vote?index=${pageIndex + 1}`}
+            >
               Next
             </Button>
           ),
           <Button
             action="post"
             key={hasNextButton ? "3" : "2"}
-            target={index > 1 ? `${index - 1}` : "/"}
+            target={pageIndex > 1 ? `/vote?index=${pageIndex - 1}` : "/"}
           >
             Back
           </Button>,
@@ -178,7 +184,6 @@ const handler = frames(async (ctx) => {
     }
   } catch (error) {
     const errorMessage = (error as Error).message || "An error occurred";
-    console.error("vote error", errorMessage);
     if (errorMessage === "Passport not found") {
       return {
         image: (
@@ -243,12 +248,14 @@ export const POST = handler;
 
 const UserComponent = ({
   user,
+  pageIndex,
   index,
   halfIndex,
   isSecondHalf,
   rotateDeg,
 }: any) => {
-  const newIndex = isSecondHalf ? halfIndex + index : index;
+  const tmpIndex = isSecondHalf ? halfIndex + index : index;
+  const newIndex = pageIndex > 1 ? tmpIndex + 6 * (pageIndex - 1) : tmpIndex;
 
   return (
     <div tw="flex flex-row justify-around h-[70px] w-[480px] my-[10px] mx-auto px-[20px]">
@@ -259,7 +266,7 @@ const UserComponent = ({
       <div tw="flex flex-row items-center w-[250px]">
         <img
           src={user.profile_picture_url}
-          tw="h-[60px] w-[60px] rounded-full mr-[20px]"
+          tw="h-[60px] w-[60px] rounded-full mr-[10px]"
           style={{ transform: `rotate(${rotateDeg}deg)`, objectFit: "cover" }}
         />
         <div tw="flex flex-col">
@@ -267,7 +274,7 @@ const UserComponent = ({
             tw="text-[19px] text-[#F0F4F8] my-auto"
             style={{ fontFamily: "Inter-Bold" }}
           >
-            {user.name}
+            {user.name.slice(0, 20)}
           </p>
           <p tw="text-[19px] text-[#9FA6AD] my-auto">{`@${user.username}`}</p>
         </div>
