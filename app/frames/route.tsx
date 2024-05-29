@@ -25,7 +25,7 @@ const handler = frames(async (ctx) => {
         />
         <div tw="absolute top-[250px] left-[75px] w-[975px] flex text-[#DFDFE1]">
           <p tw="text-[80px]" style={{ fontFamily: "Inter-Bold" }}>
-            {`${prize_pool || "XXX"} $TAL`}
+            {`${prize_pool || "XXX,XXX"} $TALENT`}
           </p>
           <div tw="flex flex-col mx-auto items-center justify-around my-[25px]"></div>
         </div>
