@@ -41,7 +41,7 @@ const handler = frames(async (ctx) => {
       <Button
         action="link"
         key="3"
-        target="https://www.notion.so/talentprotocol/Scholarships-EthCC-Take-Off-How-To-Apply-Guide-ec06928c69aa49699649256690d4b781?pvs=4"
+        target="https://www.notion.so/talentprotocol/Scholarships-EthCC-Take-Off-How-To-Guides-35161a8e649942a6b636b9e4d6b295c0"
       >
         Learn more
       </Button>,
