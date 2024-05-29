@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { FRAMES_BASE_PATH, appURL } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
