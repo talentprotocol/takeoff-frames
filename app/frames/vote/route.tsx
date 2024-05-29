@@ -6,8 +6,8 @@ import { appURL, getRotateDeg } from "@/lib/utils";
 import {
   getTalentProtocolUser,
   getTalentProtocolVoting,
+  getTalentProtocolVotingCandidate,
   getTalentProtocolVotingLeaderboard,
-  searchTalentProtocolUser,
 } from "@/lib/talent-protocol";
 
 const handler = frames(async (ctx) => {
@@ -127,10 +127,13 @@ const handler = frames(async (ctx) => {
         },
       };
     } else {
-      const nominatedUser = await searchTalentProtocolUser(nominatedUsername);
+      const nominatedUser = await getTalentProtocolVotingCandidate(
+        "eth-cc",
+        nominatedUsername
+      );
       if (!nominatedUser) throw new Error("Nominated user not found");
 
-      const imgUrl = nominatedUser.passport_profile.image_url;
+      const imgUrl = nominatedUser.profile_picture_url;
       const rotateDeg = await getRotateDeg(imgUrl);
 
       return {
@@ -155,10 +158,10 @@ const handler = frames(async (ctx) => {
                     tw="text-[58px] text-[#F0F4F8] my-auto"
                     style={{ fontFamily: "Inter-Bold" }}
                   >
-                    {nominatedUser.passport_profile.display_name}
+                    {nominatedUser.name}
                   </p>
                   <p tw="text-[42px] text-[#9FA6AD] my-auto">
-                    {`@${nominatedUser.passport_profile.name}`}
+                    {`@${nominatedUser.username}`}
                   </p>
                 </div>
               </div>
@@ -169,7 +172,7 @@ const handler = frames(async (ctx) => {
           <Button
             action="link"
             key="1"
-            target={`https://play.talentprotocol.com/votings/eth-cc?open_voting_modal=true&name=${nominatedUser.user.username}`}
+            target={`https://play.talentprotocol.com/votings/eth-cc?open_voting_modal=true&name=${nominatedUser.username}`}
           >
             {`Vote ✅`}
           </Button>,

@@ -3,11 +3,13 @@ import { unstable_cache } from "next/cache";
 export const CACHE_5_SECONDS = 5;
 export const CACHE_2_MINUTES = 60 * 2;
 export const CACHE_5_MINUTES = 60 * 5;
+export const CACHE_1_HOUR = 60 * 60;
 
 export type CacheKey =
   | `talent_protocol_${string}`
-  | `talent_protocol_search_${string}`
   | `talent_protocol_voting_${string}`
+  | `talent_protocol_voting_${string}_page_${number}`
+  | `talent_protocol_voting_${string}_user_${string}`
   | `talent_protocol_voting_eth-cc_page_${string}`;
 
 export const getTalentProtocolUser = async (walletId: string) => {
@@ -36,33 +38,6 @@ export const getTalentProtocolUser = async (walletId: string) => {
     [`talent_protocol_${walletId}`] as CacheKey[],
     { revalidate: CACHE_5_MINUTES }
   )(walletId);
-};
-
-export const searchTalentProtocolUser = async (query: string) => {
-  return unstable_cache(
-    async (query: string) => {
-      const api_url = process.env.TALENT_API_URL;
-      const api_token = process.env.TALENT_API_TOKEN;
-      const url = `${api_url}/api/v2/passports?keyword=${query}&page=1&per_page=1`;
-      const headers = {
-        "Content-Type": "application/json",
-        "X-API-KEY": api_token || "",
-      };
-
-      if (!api_token || !api_url) {
-        throw new Error("API token or URL not found");
-      }
-
-      const response = await fetch(url, { headers });
-      if (!response.ok || response.status !== 200)
-        throw new Error("User not found");
-
-      const data = (await response.json()) as any;
-      return data.passports[0];
-    },
-    [`talent_protocol_search_${query}`] as CacheKey[],
-    { revalidate: CACHE_5_MINUTES }
-  )(query);
 };
 
 export const getTalentProtocolVoting = async (votingSlug: string) => {
@@ -120,4 +95,34 @@ export const getTalentProtocolVotingLeaderboard = async (
     [`talent_protocol_voting_${query}_page_${index}`] as CacheKey[],
     { revalidate: CACHE_2_MINUTES }
   )(query, index);
+};
+
+export const getTalentProtocolVotingCandidate = async (
+  query: string,
+  username: string
+) => {
+  return unstable_cache(
+    async (query: string, username: string) => {
+      const api_url = process.env.TALENT_API_URL;
+      const api_token = process.env.TALENT_API_TOKEN;
+      const url = `${api_url}/api/v1/votings/${query}/candidates_leaderboard?per_page=1&voting_keyword=${username}`;
+      const headers = {
+        "Content-Type": "application/json",
+        "X-API-KEY": api_token || "",
+      };
+
+      if (!api_token || !api_url) {
+        throw new Error("API token or URL not found");
+      }
+
+      const response = await fetch(url, { headers });
+      if (!response.ok || response.status !== 200)
+        throw new Error("Voting not found");
+
+      const data = (await response.json()) as any;
+      return data.leaderboard?.results[0];
+    },
+    [`talent_protocol_voting_${query}_user_${username}`] as CacheKey[],
+    { revalidate: CACHE_1_HOUR }
+  )(query, username);
 };
