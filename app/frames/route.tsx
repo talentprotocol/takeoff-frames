@@ -7,6 +7,14 @@ import { getTalentProtocolVoting } from "@/lib/talent-protocol";
 
 const handler = frames(async (ctx) => {
   const voting = await getTalentProtocolVoting("eth-cc");
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    currencyDisplay: "code",
+  });
+  const prize_pool = formatter
+    .format(voting?.prize_pool || 0)
+    .replace("USD", "");
 
   return {
     image: (
@@ -17,7 +25,7 @@ const handler = frames(async (ctx) => {
         />
         <div tw="absolute top-[250px] left-[75px] w-[975px] flex text-[#DFDFE1]">
           <p tw="text-[80px]" style={{ fontFamily: "Inter-Bold" }}>
-            {`${voting?.prize_pool || "XXX"} $TAL`}
+            {`${prize_pool || "XXX"} $TAL`}
           </p>
           <div tw="flex flex-col mx-auto items-center justify-around my-[25px]"></div>
         </div>
